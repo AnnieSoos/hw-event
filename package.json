@@ -1,0 +1,11 @@
+{
+  "name": "hw-events",
+  "version": "v1",
+  "description": "rest api",
+  "main": "index.js",
+  "author": "annie",
+  "license": "MIT",
+  "dependencies": {
+    "express": "4.16.2"
+  }
+}

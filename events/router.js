@@ -7,7 +7,7 @@ const router = new Router()
 /// querying
 const Op = Sequelize.Op
 
-const today =  new Date().toJSON().slice(0,10);    /// today
+const today =  new Date().toJSON().slice(0,10);    /// today, from stackoverflow
 ////### Creating Events
 //   * When events get created, they need to start in the future
 //   * Event start dates must be before the end date.
@@ -53,7 +53,7 @@ router.get('/events/:id', (req, res) => {
       startDate: {
         [Op.gt]: today
       }
-    }  
+    }
   })
     .then(result => {
       if (result) {
@@ -75,8 +75,19 @@ router.post('/events', requireEvent, (req, res) => {
 
   Event.create(event)
     .then(entity => {
-      res.status(201)
-      res.json(entity)
+      if (entity.startDate < today.toDate) {
+        res.status(403).send({
+          message: 'You\'re not allowed to create event starting in past!'
+        })
+      } else if (entity.endDate < today.toDate) {
+        res.status(403).send({
+          message: 'You\'re not allowed to create event ending in past!'
+        })
+      }
+      else {
+        res.status(201)
+        return res.json(entity)
+      }
     })
     .catch(err => {
       res.status(422)

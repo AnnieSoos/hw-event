@@ -4,26 +4,38 @@ const Event = require('./model')
 
 const router = new Router()
 
+/// querying
+const Op = Sequelize.Op
+
+const today =  new Date().toJSON().slice(0,10);    /// today
 ////### Creating Events
-//
 //   * When events get created, they need to start in the future
 //   * Event start dates must be before the end date.
 //
 // ### Getting All Events
-//
 //   * GET /events returns only future events
 //   * GET /events returns only the title and dates of an event
 
 ///   title, startDate, endDate, description
+/// documentation:
+/// Post.findAll({
+//   where: {
+//     authorId: {
+//       [Op.or]: [12, 13]
+//     }
+//   }
+// });
+/// Op.gt > 6
 
-///app.get('/players/:id', (request, response) => {
-//   const playerId = request.params.id
-//
-//   client.query('SELECT * FROM players WHERE id = 1', [playerId], (error, result) => {
 
 router.get('/events', (req, res) => {
   Event.findAll({
     attributes: ['title', 'startDate', 'endDate',]
+    where: {
+      startDate: {
+        [Op.gt]: today
+      }
+    }
   })
     .then(result => {
       res.json(result)
@@ -35,8 +47,14 @@ router.get('/events', (req, res) => {
 });
 
 router.get('/events/:id', (req, res) => {
-  var today =  new Date().toJSON().slice(0,10);
-  Event.findById(req.params.id)
+  Event.findById(req.params.id)({
+    attributes: ['title', 'startDate', 'endDate',]
+    where: {
+      startDate: {
+        [Op.gt]: today
+      }
+    }  
+  })
     .then(result => {
       if (result) {
         res.json(result)
